@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  GUEST
+  USER
+  ADMIN
+}
+
+enum OrderType {
+  CAR
+  PART
+  CUSTOM
+}
+
+enum OrderStatus {
+  NEW
+  PROCESSING
+  APPROVED
+  PAID
+  DELIVERING
+  RECEIVED
+  COMPLETED
+  REJECTED
+  NEEDS_INFO
+}
+
+enum BodyType {
+  SEDAN
+  HATCHBACK
+  SUV
+  COUPE
+  PICKUP
+  MINIVAN
+  WAGON
+  CONVERTIBLE
+}
+
+enum EngineType {
+  PETROL
+  DIESEL
+  HYBRID
+  ELECTRIC
+  GAS
+}
+
+enum PartCategory {
+  ENGINE
+  SUSPENSION
+  BODY
+  ELECTRICS
+  INTERIOR
+  CONSUMABLES
+  BRAKES
+  TRANSMISSION
+  COOLING
+  EXHAUST
+  STEERING
+  OTHER
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  phone        String?
+  role         UserRole @default(USER)
+  blocked      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  orders        Order[]
+  favorites     Favorite[]
+  messages      Message[]
+  reviews       Review[]
+  newsArticles  News[]
+  managedOrders Order[]  @relation("ManagedOrders")
+}
+
+model Car {
+  id           String    @id @default(cuid())
+  brand        String
+  model        String
+  year         Int
+  bodyType     BodyType
+  engineType   EngineType
+  engineVolume Float
+  mileage      Int
+  country      String
+  price        Float
+  images       String[]
+  description  String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  favorites Favorite[]
+  orders    Order[]
+}
+
+model Part {
+  id            String        @id @default(cuid())
+  name          String
+  category      PartCategory
+  brand         String
+  article       String
+  compatibility String[]
+  country       String
+  price         Float
+  inStock       Boolean       @default(true)
+  images        String[]
+  description   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  favorites Favorite[]
+  orders    Order[]
+}
+
+model Order {
+  id               String      @id @default(cuid())
+  userId           String
+  user             User        @relation(fields: [userId], references: [id])
+  type             OrderType
+  carId            String?
+  car              Car?        @relation(fields: [carId], references: [id])
+  partId           String?
+  part             Part?       @relation(fields: [partId], references: [id])
+  customDescription String?
+  status           OrderStatus @default(NEW)
+  totalPrice       Float?
+  deliveryAddress  String?
+  managerId        String?
+  manager          User?       @relation("ManagedOrders", fields: [managerId], references: [id])
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  statusHistory OrderStatusHistory[]
+  messages      Message[]
+  reviews       Review[]
+}
+
+model OrderStatusHistory {
+  id        String      @id @default(cuid())
+  orderId   String
+  order     Order       @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  status    OrderStatus
+  comment   String?
+  changedBy String?
+  createdAt DateTime    @default(now())
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemType  String
+  carId     String?
+  car       Car?     @relation(fields: [carId], references: [id])
+  partId    String?
+  part      Part?    @relation(fields: [partId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([userId, carId, partId])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation(fields: [senderId], references: [id])
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  orderId   String   @unique
+  order     Order    @relation(fields: [orderId], references: [id])
+  rating    Int
+  text      String
+  createdAt DateTime @default(now())
+}
+
+model News {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  image     String?
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CalculatorSettings {
+  id             String @id @default(cuid())
+  country        String @unique
+  dutyRate       Float
+  logisticsCost  Float
+  brokerFee      Float
+  commissionRate Float
+}

@@ -1,0 +1,121 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0F172A;
+  --color-primary-light: #1E293B;
+  --color-accent: #F59E0B;
+  --color-accent-hover: #D97706;
+  --color-surface: #F8FAFC;
+  --color-card: #FFFFFF;
+  --color-muted: #64748B;
+  --color-border: #E2E8F0;
+  --color-success: #22C55E;
+  --color-danger: #EF4444;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-surface);
+  color: var(--color-primary);
+  margin: 0;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+[data-theme="dark"] body,
+body.dark {
+  background-color: #0F172A;
+  color: #E2E8F0;
+}
+
+[data-theme="dark"] .glass,
+body.dark .glass {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+[data-theme="dark"] .bg-card,
+body.dark .bg-card {
+  background-color: #1E293B !important;
+}
+
+[data-theme="dark"] .bg-surface,
+body.dark .bg-surface {
+  background-color: #0F172A !important;
+}
+
+[data-theme="dark"] .text-primary,
+body.dark .text-primary {
+  color: #E2E8F0 !important;
+}
+
+[data-theme="dark"] .text-muted,
+body.dark .text-muted {
+  color: #94A3B8 !important;
+}
+
+[data-theme="dark"] .border-border,
+body.dark .border-border {
+  border-color: #334155 !important;
+}
+
+[data-theme="dark"] .bg-primary\/5,
+body.dark .bg-primary\/5 {
+  background-color: rgba(148, 163, 184, 0.08) !important;
+}
+
+[data-theme="dark"] .bg-primary\/10,
+body.dark .bg-primary\/10 {
+  background-color: rgba(148, 163, 184, 0.1) !important;
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea,
+body.dark input,
+body.dark select,
+body.dark textarea {
+  background-color: #1E293B;
+  color: #E2E8F0;
+  border-color: #334155;
+}
+
+[data-theme="dark"] hr,
+body.dark hr {
+  border-color: #334155 !important;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #F59E0B, #EF4444);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #E2E8F0 25%, #F1F5F9 50%, #E2E8F0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+[data-theme="dark"] .skeleton,
+body.dark .skeleton {
+  background: linear-gradient(90deg, #334155 25%, #475569 50%, #334155 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

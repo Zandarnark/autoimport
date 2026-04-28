@@ -76,23 +76,23 @@ export default function PartDetail() {
   const compatibilityList = Array.isArray(part.compatibility) ? part.compatibility : []
 
   return (
-    <div className="flex flex-col gap-8">
-      <nav className="flex items-center gap-2 text-sm text-muted">
+    <div className="flex min-w-0 flex-col gap-8 overflow-hidden">
+      <nav className="flex min-w-0 items-center gap-2 text-sm text-muted">
         <Link to="/parts" className="transition-colors hover:text-primary">Запчасти</Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="text-primary">{part.name}</span>
+        <ChevronRight className="h-4 w-4 shrink-0" />
+        <span className="min-w-0 truncate text-primary">{part.name}</span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+      <div className="grid min-w-0 gap-6 lg:grid-cols-2 lg:gap-8">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp} className="min-w-0">
           {part.images?.length > 0 ? (
             <img
               src={part.images[0]}
               alt={part.name}
-              className="h-[400px] w-full rounded-xl object-cover"
+              className="h-64 w-full rounded-xl object-cover sm:h-[400px]"
             />
           ) : (
-            <div className="flex h-[400px] items-center justify-center rounded-xl bg-primary/5">
+             <div className="flex h-64 items-center justify-center rounded-xl bg-primary/5 sm:h-[400px]">
               <Package className="h-20 w-20 text-muted" />
             </div>
           )}
@@ -102,10 +102,10 @@ export default function PartDetail() {
           initial="hidden"
           animate="visible"
           variants={fadeUp}
-          className="flex flex-col gap-6"
+          className="flex min-w-0 flex-col gap-6"
         >
-          <div>
-            <h1 className="mb-2 text-3xl font-bold text-primary">{part.name}</h1>
+          <div className="min-w-0">
+            <h1 className="mb-2 break-words text-2xl font-bold text-primary sm:text-3xl">{part.name}</h1>
             <div className="flex flex-wrap items-center gap-2">
               {part.category && <Badge variant="default">{part.category}</Badge>}
               {part.article && (
@@ -115,7 +115,7 @@ export default function PartDetail() {
           </div>
 
           {compatibilityList.length > 0 && (
-            <div className="rounded-xl border border-border bg-card p-4">
+            <div className="min-w-0 rounded-xl border border-border bg-card p-4">
               <h3 className="mb-3 text-sm font-semibold text-primary">Совместимость</h3>
               <div className="flex flex-wrap gap-2">
                 {compatibilityList.map((item: string, i: number) => (
@@ -127,11 +127,11 @@ export default function PartDetail() {
             </div>
           )}
 
-          <div className="rounded-xl border border-border bg-card p-4">
-            <div className="mb-4 flex items-end justify-between">
-              <div>
+          <div className="min-w-0 rounded-xl border border-border bg-card p-4">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div className="min-w-0">
                 <span className="text-sm text-muted">Цена</span>
-                <p className="text-3xl font-bold text-accent">
+                <p className="break-words text-2xl font-bold text-accent sm:text-3xl">
                   {Number(part.price).toLocaleString('ru-RU')} ₽
                 </p>
               </div>
@@ -141,7 +141,7 @@ export default function PartDetail() {
                 <Badge variant="danger">Нет в наличии</Badge>
               )}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col gap-3 min-[380px]:flex-row">
               <Link to={`/request?type=part&item=${id}`} className="flex-1">
                 <Button size="lg" variant="primary" className="w-full">
                   <ShoppingCart className="h-5 w-5" />
@@ -169,7 +169,7 @@ export default function PartDetail() {
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeUp}
-          className="rounded-xl border border-border bg-card p-6"
+          className="min-w-0 rounded-xl border border-border bg-card p-4 sm:p-6"
         >
           <h3 className="mb-3 text-lg font-semibold text-primary">Описание</h3>
           <p className="whitespace-pre-line text-sm leading-relaxed text-muted">

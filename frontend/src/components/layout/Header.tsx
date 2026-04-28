@@ -26,8 +26,8 @@ export default function Header() {
   }
 
   return (
-    <header className="glass sticky top-0 z-50 shadow-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3">
+    <header className="sticky top-0 z-50 border-b border-border bg-card shadow-md">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link to="/" className="gradient-text flex items-center gap-2 text-xl font-bold">
           <Car className="h-6 w-6" />
           AutoImport
@@ -129,7 +129,7 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed right-0 top-0 z-50 flex h-full w-72 flex-col gap-4 bg-card p-6 shadow-xl md:hidden"
+              className="fixed right-0 top-0 z-50 flex h-full w-[min(20rem,85vw)] flex-col gap-4 border-l border-border bg-card p-6 shadow-2xl md:hidden"
             >
               <button
                 onClick={() => setMobileOpen(false)}

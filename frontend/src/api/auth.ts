@@ -10,7 +10,7 @@ export const authApi = {
     api.put('/auth/me', data),
   uploadAvatar: (file: File) => {
     const formData = new FormData()
-    formData.append('file', file)
+    formData.append('image', file)
     return api.post('/upload/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     })

@@ -5,6 +5,8 @@ export interface User {
   email: string
   firstName: string
   lastName: string
+  nickname: string | null
+  avatar: string | null
   phone: string | null
   role: 'GUEST' | 'USER' | 'ADMIN'
 }

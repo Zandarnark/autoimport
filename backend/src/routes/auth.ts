@@ -26,7 +26,7 @@ router.post(
       return;
     }
 
-    const { email, password, firstName, lastName, phone } = req.body;
+const { email, password, firstName, lastName, nickname, phone } = req.body;
 
     try {
       const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -38,18 +38,19 @@ router.post(
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash: hashedPassword,
-        firstName,
-        lastName,
-        phone,
-      },
+        data: {
+          email,
+          passwordHash: hashedPassword,
+          firstName,
+          lastName,
+          nickname,
+          phone,
+        },
       });
 
       const token = generateToken(user.id, user.role);
 
-      res.status(201).json({ token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role } });
+      res.status(201).json({ token, user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, nickname: user.nickname, avatar: user.avatar, role: user.role } });
     } catch (error) {
       res.status(500).json({ message: 'Ошибка сервера', error });
     }
@@ -91,10 +92,10 @@ router.post(
 
       const token = generateToken(user.id, user.role);
 
-      res.json({
-        token,
-        user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, role: user.role },
-      });
+res.json({
+      token,
+      user: { id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, nickname: user.nickname, avatar: user.avatar, role: user.role },
+    });
     } catch (error) {
       res.status(500).json({ message: 'Ошибка сервера', error });
     }
@@ -103,7 +104,7 @@ router.post(
 
 router.get('/me', protect, async (req: Request, res: Response) => {
   try {
-    const user = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { id: true, email: true, firstName: true, lastName: true, phone: true, role: true, blocked: true } });
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id }, select: { id: true, email: true, firstName: true, lastName: true, nickname: true, avatar: true, phone: true, role: true, blocked: true } });
     if (!user) {
       res.status(404).json({ message: 'Пользователь не найден' });
       return;
@@ -115,13 +116,33 @@ router.get('/me', protect, async (req: Request, res: Response) => {
 });
 
 router.put('/me', protect, async (req: Request, res: Response) => {
-  const { firstName, lastName, phone } = req.body;
+  const { firstName, lastName, nickname, phone } = req.body;
 
   try {
     const user = await prisma.user.update({
       where: { id: req.user!.id },
-      data: { firstName, lastName, phone },
-      select: { id: true, email: true, firstName: true, lastName: true, phone: true, role: true },
+      data: { firstName, lastName, nickname, phone },
+      select: { id: true, email: true, firstName: true, lastName: true, nickname: true, avatar: true, phone: true, role: true },
+    });
+
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: 'Ошибка сервера', error });
+  }
+});
+
+router.put('/me/avatar', protect, async (req: Request, res: Response) => {
+  const { avatar } = req.body;
+  if (!avatar) {
+    res.status(400).json({ message: 'URL аватара обязателен' });
+    return;
+  }
+
+  try {
+    const user = await prisma.user.update({
+      where: { id: req.user!.id },
+      data: { avatar },
+      select: { id: true, email: true, firstName: true, lastName: true, nickname: true, avatar: true, phone: true, role: true },
     });
 
     res.json(user);

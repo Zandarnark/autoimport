@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { User, Heart, Package, Settings } from 'lucide-react'
+import { User, Heart, Package, Settings, Camera } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { authApi } from '../../api/auth'
 import { useAuthStore } from '../../store/authStore'
@@ -15,6 +15,7 @@ import Card from '../../components/ui/Card'
 const schema = z.object({
   firstName: z.string().min(1, 'Введите имя'),
   lastName: z.string().min(1, 'Введите фамилию'),
+  nickname: z.string().optional(),
   phone: z.string().optional(),
 })
 
@@ -29,6 +30,8 @@ const menuItems = [
 export default function Profile() {
   const { user, setUser } = useAuthStore()
   const [loading, setLoading] = useState(false)
+  const [avatarLoading, setAvatarLoading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
   const location = useLocation()
 
   const {
@@ -40,6 +43,7 @@ export default function Profile() {
     defaultValues: {
       firstName: user?.firstName ?? '',
       lastName: user?.lastName ?? '',
+      nickname: user?.nickname ?? '',
       phone: user?.phone ?? '',
     },
   })
@@ -57,6 +61,29 @@ export default function Profile() {
       setLoading(false)
     }
   }
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Файл слишком большой (макс. 5 МБ)')
+      return
+    }
+    setAvatarLoading(true)
+    try {
+      const uploadRes = await authApi.uploadAvatar(file)
+      const avatarUrl = uploadRes.data.url
+      const res = await authApi.setAvatar(avatarUrl)
+      setUser(res.data)
+      toast.success('Аватар обновлён')
+    } catch {
+      toast.error('Ошибка загрузки аватара')
+    } finally {
+      setAvatarLoading(false)
+    }
+  }
+
+  const displayName = user?.nickname || `${user?.firstName} ${user?.lastName}`
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
@@ -94,20 +121,42 @@ export default function Profile() {
           transition={{ duration: 0.4 }}
         >
           <Card>
-            <div className="mb-6 flex items-center gap-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-xl font-bold text-white">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
+            <div className="mb-6 flex flex-col items-center gap-4 sm:flex-row">
+              <div className="relative">
+                {user?.avatar ? (
+                  <img src={user.avatar} alt="" className="h-20 w-20 rounded-full object-cover" />
+                ) : (
+                  <div className="flex h-20 w-20 items-center justify-center rounded-full bg-accent text-2xl font-bold text-white">
+                    {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  </div>
+                )}
+                <button
+                  onClick={() => fileRef.current?.click()}
+                  disabled={avatarLoading}
+                  className="absolute -right-1 -bottom-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-card bg-accent text-white transition-colors hover:bg-accent-hover"
+                  aria-label="Загрузить аватар"
+                >
+                  <Camera className="h-3.5 w-3.5" />
+                </button>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                />
               </div>
-              <div>
-                <p className="font-semibold text-primary">
-                  {user?.firstName} {user?.lastName}
-                </p>
+              <div className="text-center sm:text-left">
+                <p className="text-lg font-semibold text-primary">{displayName}</p>
+                {user?.nickname && (
+                  <p className="text-sm text-muted">{user.firstName} {user.lastName}</p>
+                )}
                 <p className="text-sm text-muted">{user?.email}</p>
               </div>
             </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Input
                   label="Имя"
                   placeholder="Иван"
@@ -121,6 +170,12 @@ export default function Profile() {
                   {...register('lastName')}
                 />
               </div>
+              <Input
+                label="Никнейм"
+                placeholder="Ваш уникальный ник"
+                error={errors.nickname?.message}
+                {...register('nickname')}
+              />
               <Input
                 label="Телефон"
                 placeholder="+7 (999) 123-45-67"

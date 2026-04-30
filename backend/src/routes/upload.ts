@@ -12,6 +12,14 @@ router.post('/single', protect, uploadSingle, (req: Request, res: Response) => {
   res.json({ url: `/uploads/${req.file.filename}` });
 });
 
+router.post('/avatar', protect, uploadSingle, (req: Request, res: Response) => {
+  if (!req.file) {
+    res.status(400).json({ message: 'Файл не загружен' });
+    return;
+  }
+  res.json({ url: `/uploads/${req.file.filename}` });
+});
+
 router.post('/multiple', protect, adminOnly, uploadMultiple, (req: Request, res: Response) => {
   const files = req.files as Express.Multer.File[];
   if (!files || files.length === 0) {

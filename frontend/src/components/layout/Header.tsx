@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, Car, User, LogOut, Sun, Moon } from 'lucide-react'
+import { Menu, X, Car, User, LogOut, Sun, Moon, ZoomIn } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAuthStore } from '../../store/authStore'
 import { useThemeStore } from '../../store/themeStore'
+import { useAccessibilityStore, ZOOM_LABEL } from '../../store/accessibilityStore'
 
 const navLinks = [
   { to: '/cars', label: 'Автомобили' },
@@ -13,10 +14,24 @@ const navLinks = [
   { to: '/news', label: 'Новости' },
 ]
 
+function UserAvatar({ user, size = 'sm' }: { user: any; size?: 'sm' | 'md' }) {
+  const dim = size === 'sm' ? 'h-8 w-8 text-xs' : 'h-10 w-10 text-sm'
+  if (user?.avatar) {
+    return <img src={user.avatar} alt="" className={`${dim} rounded-full object-cover`} />
+  }
+  const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`
+  return (
+    <div className={`${dim} flex shrink-0 items-center justify-center rounded-full bg-accent font-bold text-white`}>
+      {initials || <User className="h-4 w-4" />}
+    </div>
+  )
+}
+
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { isAuthenticated, user, logout } = useAuthStore()
   const { theme, toggleTheme } = useThemeStore()
+  const { zoom, cycleZoom } = useAccessibilityStore()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -24,6 +39,8 @@ export default function Header() {
     toast.success('Вы вышли из аккаунта')
     navigate('/')
   }
+
+  const displayName = user?.nickname || `${user?.firstName} ${user?.lastName}`
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-card shadow-md">
@@ -53,6 +70,14 @@ export default function Header() {
           >
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
+          <button
+            onClick={cycleZoom}
+            className="rounded-lg p-2 text-muted transition-colors hover:bg-primary/5 hover:text-accent"
+            aria-label={`Масштаб: ${ZOOM_LABEL[zoom]}`}
+            title={`Масштаб: ${ZOOM_LABEL[zoom]}`}
+          >
+            <ZoomIn className="h-5 w-5" />
+          </button>
           {isAuthenticated ? (
             <>
               {user?.role === 'ADMIN' && (
@@ -65,10 +90,10 @@ export default function Header() {
               )}
               <Link
                 to="/profile"
-                className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-accent transition-colors"
+                className="flex items-center gap-2 text-sm font-medium text-primary hover:text-accent transition-colors"
               >
-                <User className="h-4 w-4" />
-                Личный кабинет
+                <UserAvatar user={user} size="sm" />
+                <span className="max-w-[120px] truncate">{displayName}</span>
               </Link>
               <button
                 onClick={handleLogout}
@@ -105,6 +130,14 @@ export default function Header() {
             {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </button>
           <button
+            onClick={cycleZoom}
+            className="rounded-lg p-2 text-muted transition-colors hover:text-accent"
+            aria-label={`Масштаб: ${ZOOM_LABEL[zoom]}`}
+            title={`Масштаб: ${ZOOM_LABEL[zoom]}`}
+          >
+            <ZoomIn className="h-5 w-5" />
+          </button>
+          <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className="text-primary"
             aria-label="Меню"
@@ -139,6 +172,16 @@ export default function Header() {
                 <X className="h-6 w-6" />
               </button>
 
+              {isAuthenticated && (
+                <div className="flex items-center gap-3 rounded-lg bg-primary/5 px-3 py-2">
+                  <UserAvatar user={user} size="md" />
+                  <div className="min-w-0">
+                    <p className="truncate font-semibold text-primary">{displayName}</p>
+                    <p className="truncate text-xs text-muted">{user?.email}</p>
+                  </div>
+                </div>
+              )}
+
               <nav className="flex flex-col gap-3">
                 {navLinks.map((link) => (
                   <Link
@@ -156,15 +199,15 @@ export default function Header() {
 
               {isAuthenticated ? (
                 <div className="flex flex-col gap-3">
-                {user?.role === 'ADMIN' && (
-                  <Link
-                    to="/admin"
-                    onClick={() => setMobileOpen(false)}
-                    className="rounded-lg bg-accent px-3 py-2 text-center font-bold text-white"
-                  >
-                    Админ-панель
-                  </Link>
-                )}
+                  {user?.role === 'ADMIN' && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="rounded-lg bg-accent px-3 py-2 text-center font-bold text-white"
+                    >
+                      Админ-панель
+                    </Link>
+                  )}
                   <Link
                     to="/profile"
                     onClick={() => setMobileOpen(false)}

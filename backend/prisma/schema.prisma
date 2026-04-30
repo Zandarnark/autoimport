@@ -66,40 +66,42 @@ enum PartCategory {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id        String   @id @default(cuid())
+  email     String   @unique
   passwordHash String
-  firstName    String
-  lastName     String
-  phone        String?
-  role         UserRole @default(USER)
-  blocked      Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  firstName String
+  lastName  String
+  nickname  String?
+  avatar    String?
+  phone     String?
+  role      UserRole @default(USER)
+  blocked   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  orders        Order[]
-  favorites     Favorite[]
-  messages      Message[]
-  reviews       Review[]
-  newsArticles  News[]
-  managedOrders Order[]  @relation("ManagedOrders")
+  orders         Order[]
+  favorites      Favorite[]
+  messages       Message[]
+  reviews        Review[]
+  newsArticles   News[]
+  managedOrders  Order[] @relation("ManagedOrders")
 }
 
 model Car {
-  id           String    @id @default(cuid())
-  brand        String
-  model        String
-  year         Int
-  bodyType     BodyType
-  engineType   EngineType
-  engineVolume Float
-  mileage      Int
-  country      String
-  price        Float
-  images       String[]
-  description  String
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id            String     @id @default(cuid())
+  brand         String
+  model         String
+  year          Int
+  bodyType      BodyType
+  engineType    EngineType
+  engineVolume  Float
+  mileage       Int
+  country       String
+  price         Float
+  images        String[]
+  description   String
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
 
   favorites Favorite[]
   orders    Order[]
@@ -125,22 +127,22 @@ model Part {
 }
 
 model Order {
-  id               String      @id @default(cuid())
+  id               String       @id @default(cuid())
   userId           String
-  user             User        @relation(fields: [userId], references: [id])
+  user             User         @relation(fields: [userId], references: [id])
   type             OrderType
   carId            String?
-  car              Car?        @relation(fields: [carId], references: [id])
+  car              Car?         @relation(fields: [carId], references: [id])
   partId           String?
-  part             Part?       @relation(fields: [partId], references: [id])
+  part             Part?        @relation(fields: [partId], references: [id])
   customDescription String?
-  status           OrderStatus @default(NEW)
+  status           OrderStatus  @default(NEW)
   totalPrice       Float?
   deliveryAddress  String?
   managerId        String?
-  manager          User?       @relation("ManagedOrders", fields: [managerId], references: [id])
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
+  manager          User?        @relation("ManagedOrders", fields: [managerId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
 
   statusHistory OrderStatusHistory[]
   messages      Message[]

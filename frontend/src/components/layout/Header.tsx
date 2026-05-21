@@ -47,7 +47,7 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         <Link to="/" className="gradient-text flex items-center gap-2 text-xl font-bold">
           <Car className="h-6 w-6" />
-          AutoImport
+          Car2Russia
         </Link>
 
         <nav className="hidden items-center gap-6 md:flex">

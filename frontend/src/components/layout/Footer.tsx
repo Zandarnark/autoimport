@@ -7,7 +7,7 @@ export default function Footer() {
         <div>
           <h3 className="mb-4 text-lg font-bold">О компании</h3>
           <p className="text-sm leading-relaxed text-white/70">
-            AutoImport — надёжный партнёр по импорту автомобилей и запчастей из-за рубежа.
+            Car2Russia — надёжный партнёр по импорту автомобилей и запчастей из-за рубежа.
             Работаем с 2010 года, доставляем по всей России.
           </p>
         </div>
@@ -27,8 +27,8 @@ export default function Footer() {
           <ul className="flex flex-col gap-3 text-sm text-white/70">
             <li className="flex items-center gap-2">
               <Mail className="h-4 w-4 shrink-0" />
-              <a href="mailto:info@autoimport.ru" className="hover:text-accent transition-colors">
-                info@autoimport.ru
+              <a href="mailto:info@car2russia.ru" className="hover:text-accent transition-colors">
+                info@car2russia.ru
               </a>
             </li>
             <li className="flex items-center gap-2">
@@ -47,7 +47,7 @@ export default function Footer() {
 
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-4 text-center text-sm text-white/50">
-          © 2026 AutoImport. Все права защищены.
+          © 2026 Car2Russia. Все права защищены.
         </div>
       </div>
     </footer>
